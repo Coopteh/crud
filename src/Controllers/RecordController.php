@@ -24,7 +24,9 @@ class RecordController
     public function update(int $id, array $data): ?Record
     {
         $record = Record::find($id);
-        if (!$record) return null;
+        if (!$record) {
+            return null;
+        }
 
         $record->title = $data['title'] ?? $record->title;
         $record->content = $data['content'] ?? $record->content;

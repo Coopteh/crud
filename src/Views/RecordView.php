@@ -51,7 +51,9 @@ class RecordView
 
     public function show(?Record $record): string
     {
-        if (!$record) return $this->error('Не найдено.');
+        if (!$record) {
+            return $this->error('Не найдено.');
+        }
 
         return '<!DOCTYPE html>
 <html lang="ru">
