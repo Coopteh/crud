@@ -3,5 +3,8 @@
         "psr-4": {
             "Crud\\": "src/"
         }
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^3.94"
     }
 }

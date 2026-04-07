@@ -1,4 +1,5 @@
 <?php
+
 namespace Crud\Controllers;
 
 use Crud\Models\Record;
@@ -10,7 +11,7 @@ class RecordController
     {
         $model = new Record();
         $records = $model->getAll();
-        
+
         $view = new RecordView();
         echo $view->render($records);
     }

@@ -1,4 +1,5 @@
 <?php
+
 namespace Crud\Models;
 
 use PDO;
@@ -7,14 +8,14 @@ use PDOException;
 class Record
 {
     private PDO $pdo;
-    
+
     public function __construct()
     {
         $host = 'localhost';
         $dbname = 'example1';
         $user = 'root';
         $pass = '';
-        
+
         try {
             $this->pdo = new PDO(
                 "mysql:host=$host;dbname=$dbname;charset=utf8mb4",
@@ -29,7 +30,7 @@ class Record
             die("Ошибка подключения: " . $e->getMessage());
         }
     }
-    
+
     public function getAll(): array
     {
         $stmt = $this->pdo->query("SELECT * FROM table1 ORDER BY id");
