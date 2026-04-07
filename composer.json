@@ -1,0 +1,11 @@
+{
+  "name": "crud/mvc-project",
+  "description": "CRUD project with PDO",
+  "type": "project",
+  "autoload": {
+    "psr-4": {
+      "Crud\\": "src/"
+    }
+  },
+  "require": {}
+}
