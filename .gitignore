@@ -1,0 +1,5 @@
+/crud/
+
+vendor/
+*.log
+.DS_Store
