@@ -1,4 +1,5 @@
 <?php
+
 namespace Crud\Views;
 
 class RecordView
@@ -22,14 +23,14 @@ class RecordView
             </tr>
         </thead>
         <tbody>';
-        
+
         foreach ($records as $record) {
             $html .= '<tr>
                 <th scope="row">' . htmlspecialchars($record['id']) . '</th>
                 <td>' . htmlspecialchars($record['name']) . '</td>
             </tr>';
         }
-        
+
         $html .= '</tbody></table></body></html>';
         return $html;
     }

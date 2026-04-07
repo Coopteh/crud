@@ -1,4 +1,5 @@
 <?php
+
 // Подключение автозагрузчика Composer
 require_once __DIR__ . '/vendor/autoload.php';
 
@@ -16,12 +17,12 @@ $options = [
 
 try {
     $pdo = new PDO($dsn, $username, $password, $options);
-    
+
     // Обработка GET-запроса
     $controller = new RecordController($pdo);
     $controller->index();
-    
+
 } catch (PDOException $e) {
     http_response_code(500);
-    echo "Ошибка подключения к БД: " . htmlspecialchars($e->getMessage());
+    echo 'Ошибка подключения к БД: ' . htmlspecialchars($e->getMessage());
 }
