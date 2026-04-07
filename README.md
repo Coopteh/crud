@@ -37,7 +37,8 @@ id (int, PK, AI), name (VARCHAR(200))
 ```
 
 Основное задание  
-используйте документацию по PDO  
+используйте документацию по [PDO](https://www.php.net/manual/ru/book.pdo.php)  
+видео по теме [PHP + PDO. Работа с MySQL](https://www.youtube.com/watch?v=a9l3QPMqZ1Q)  
 ```
 Создайте проект с 1 контроллером RecordController, который вызывается из точки входа index.php
 внутри метода контроллера для get-запроса идет обращение:
