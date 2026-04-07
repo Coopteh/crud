@@ -1,6 +1,8 @@
 <?php
 namespace App\Models;
 use PDO;
+use PDOException;
+use RuntimeException;
 class Record {
     private PDO $pdo;
 
