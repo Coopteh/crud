@@ -1,0 +1,13 @@
+{
+    "name": "coopteh/crud-project",
+    "description": "MVC CRUD project with PDO",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "Crud\\": "src/"
+        }
+    },
+    "require": {
+        "php": ">=7.4"
+    }
+}
