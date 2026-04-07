@@ -1,9 +1,13 @@
 <?php
+
 namespace App\Models;
+
 use PDO;
 use PDOException;
 use RuntimeException;
-class Record {
+
+class Record
+{
     private PDO $pdo;
 
     public function __construct()

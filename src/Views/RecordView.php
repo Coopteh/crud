@@ -1,10 +1,12 @@
 <?php
+
 namespace App\Views;
 
-class RecordView {
+class RecordView
+{
     public function render(array $records): void
     {
-?>
+        ?>
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -28,9 +30,9 @@ class RecordView {
                     <thead class="table-dark">
                         <tr>
                             <?php
-                            // Динамически выводим заголовки колонок по ключам первой записи
-                            $headers = array_keys($records[0]);
-                            foreach ($headers as $header): ?>
+                                    // Динамически выводим заголовки колонок по ключам первой записи
+                                    $headers = array_keys($records[0]);
+            foreach ($headers as $header): ?>
                                 <th><?= htmlspecialchars($header, ENT_QUOTES, 'UTF-8') ?></th>
                             <?php endforeach; ?>
                         </tr>
