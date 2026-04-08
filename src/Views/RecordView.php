@@ -20,36 +20,34 @@ class RecordView
             --border: #dee2e6;
             --hover: #f1f3f5;
             --active: #212529;
+            --deleted: #8b949e;
         }
         body { background-color: var(--bg); color: var(--text); font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
         .container { max-width: 960px; }
         h1 { font-size: 1.4rem; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 1.5rem; }
         
-        /* Таблица */
         .table { font-size: 0.9rem; margin-bottom: 0; border-color: var(--border); }
         .table th { font-weight: 500; color: var(--muted); text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.06em; border-bottom: 1px solid var(--border); padding-top: 0.75rem; padding-bottom: 0.75rem; }
         .table td { vertical-align: middle; border-color: var(--border); }
         .table-hover tbody tr:hover { background-color: var(--hover); }
+        .row-deleted { color: var(--deleted); opacity: 0.7; }
+        .status-tag { font-size: 0.7rem; color: var(--deleted); text-transform: uppercase; letter-spacing: 0.04em; margin-left: 0.5rem; }
         
-        /* Кнопки (строгие, монохромные) */
         .btn { font-size: 0.8rem; font-weight: 500; border-radius: 2px; padding: 0.25rem 0.75rem; border-width: 1px; transition: all 0.15s ease; }
         .btn-outline-dark { border-color: var(--border); color: #495057; background: transparent; }
         .btn-outline-dark:hover { background-color: var(--active); border-color: var(--active); color: #fff; }
         .btn-outline-secondary { border-color: var(--border); color: #495057; background: transparent; }
         .btn-outline-secondary:hover { background-color: var(--hover); border-color: #adb5bd; }
         
-        /* Формы */
         .form-control { border-radius: 2px; font-size: 0.9rem; padding: 0.5rem 0.75rem; border-color: var(--border); }
         .form-control:focus { border-color: #adb5bd; box-shadow: none; background-color: #fff; }
         .form-label { color: var(--muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.35rem; }
         
-        /* Пагинация */
         .pagination .page-link { color: #495057; border: none; padding: 0.4rem 0.9rem; font-size: 0.85rem; border-radius: 2px; margin: 0 2px; background: transparent; }
         .pagination .page-link:hover { background-color: var(--hover); color: var(--text); }
         .pagination .active .page-link { background-color: var(--active); color: #fff; }
         .pagination .disabled .page-link { color: #ced4da; pointer-events: none; background: transparent; }
         
-        /* Карточки */
         .card { border: 1px solid var(--border); border-radius: 3px; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,0.04); }
     </style>
 </head>
@@ -68,19 +66,24 @@ class RecordView
 
         $html .= '<div class="card">';
         $html .= '<table class="table table-hover mb-0">';
-        $html .= '<thead><tr><th width="8%">ID</th><th>Название</th><th width="30%" class="text-end">Действия</th></tr></thead>';
+        $html .= '<thead><tr><th width="8%">ID</th><th>Название</th><th width="25%" class="text-end">Действия</th></tr></thead>';
         $html .= '<tbody>';
 
         if (empty($records)) {
             $html .= '<tr><td colspan="3" class="text-center py-4" style="color: var(--muted);">Записи отсутствуют</td></tr>';
         } else {
             foreach ($records as $row) {
-                $html .= '<tr>';
+                $isDeleted = (int)$row['is_deleted'] === 1;
+                $rowClass  = $isDeleted ? 'row-deleted' : '';
+                
+                $html .= '<tr class="' . $rowClass . '">';
                 $html .= '<td style="color: var(--muted);">' . (int)$row['id'] . '</td>';
-                $html .= '<td>' . htmlspecialchars($row['name']) . '</td>';
+                $html .= '<td>' . htmlspecialchars($row['name']);
+                $html .= $isDeleted ? '<span class="status-tag">— удалено</span>' : '';
+                $html .= '</td>';
                 $html .= '<td class="text-end">';
                 $html .= '<a href="?action=edit&id=' . $row['id'] . '" class="btn btn-outline-secondary me-1">Редактировать</a>';
-                $html .= '<a href="?action=delete&id=' . $row['id'] . '" class="btn btn-outline-dark" onclick="return confirm(\'Удалить запись?\')">Удалить</a>';
+                $html .= '<a href="?action=toggle&id=' . $row['id'] . '" class="btn btn-outline-dark">' . ($isDeleted ? 'Восстановить' : 'Удалить') . '</a>';
                 $html .= '</td></tr>';
             }
         }

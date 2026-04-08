@@ -25,7 +25,7 @@ class Record
 
     public function getAll(?int $limit = null, ?int $offset = null): array
     {
-        $sql = "SELECT id, name FROM table1 ORDER BY id";
+        $sql = "SELECT id, name, is_deleted FROM table1 ORDER BY id";
         if ($limit !== null) {
             $sql .= " LIMIT :limit OFFSET :offset";
             $stmt = $this->pdo->prepare($sql);
@@ -51,7 +51,7 @@ class Record
 
     public function insert(string $name): bool
     {
-        $stmt = $this->pdo->prepare("INSERT INTO table1 (name) VALUES (:name)");
+        $stmt = $this->pdo->prepare("INSERT INTO table1 (name, is_deleted) VALUES (:name, 0)");
         return $stmt->execute(['name' => $name]);
     }
 
@@ -61,9 +61,12 @@ class Record
         return $stmt->execute(['name' => $name, 'id' => $id]);
     }
 
-    public function delete(int $id): bool
+    /**
+     * Переключает статус удаления: 0 -> 1, 1 -> 0
+     */
+    public function toggleStatus(int $id): bool
     {
-        $stmt = $this->pdo->prepare("DELETE FROM table1 WHERE id = :id");
+        $stmt = $this->pdo->prepare("UPDATE table1 SET is_deleted = IF(is_deleted = 1, 0, 1) WHERE id = :id");
         return $stmt->execute(['id' => $id]);
     }
 }

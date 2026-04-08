@@ -45,8 +45,10 @@ class RecordController
                 }
                 break;
 
-            case 'delete':
-                $this->model->delete((int)$_GET['id']);
+            case 'toggle':
+                if (isset($_GET['id'])) {
+                    $this->model->toggleStatus((int)$_GET['id']);
+                }
                 $this->redirect();
                 break;
 
