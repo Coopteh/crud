@@ -2,7 +2,7 @@
 
 class RecordView
 {
-    public function list(array $records): string
+    public function list(array $records, int $currentPage = 1, int $totalPages = 1): string
     {
         $html = '<!DOCTYPE html>
 <html lang="ru">
@@ -11,6 +11,7 @@ class RecordView
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Records</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
 </head>
 <body class="container mt-4">
     <h1>Записи</h1>
@@ -40,10 +41,62 @@ class RecordView
         }
 
         $html .= '</tbody>
-    </table>
-    <a href="?action=insert" class="btn btn-primary mb-3">Добавить запись</a>
+    </table>';
+
+        // Пагинация
+        $html .= $this->pagination($currentPage, $totalPages);
+
+        $html .= '<a href="?action=insert" class="btn btn-primary mb-3">Добавить запись</a>
 </body>
 </html>';
+
+        return $html;
+    }
+
+    private function pagination(int $currentPage, int $totalPages): string
+    {
+        if ($totalPages <= 1) return '';
+
+        $html = '<nav><ul class="pagination justify-content-center">';
+
+        // Первая страница
+        if ($currentPage > 1) {
+            $html .= '<li class="page-item"><a class="page-link" href="?action=index&page=1"><i class="bi bi-chevron-double-left"></i></a></li>';
+        } else {
+            $html .= '<li class="page-item disabled"><a class="page-link" href="#"><i class="bi bi-chevron-double-left"></i></a></li>';
+        }
+
+        // Предыдущая страница
+        if ($currentPage > 1) {
+            $html .= '<li class="page-item"><a class="page-link" href="?action=index&page=' . ($currentPage - 1) . '"><i class="bi bi-chevron-left"></i></a></li>';
+        } else {
+            $html .= '<li class="page-item disabled"><a class="page-link" href="#"><i class="bi bi-chevron-left"></i></a></li>';
+        }
+
+        // Номера страниц
+        for ($i = 1; $i <= $totalPages; $i++) {
+            if ($i == $currentPage) {
+                $html .= '<li class="page-item active"><a class="page-link" href="#">' . $i . '</a></li>';
+            } else {
+                $html .= '<li class="page-item"><a class="page-link" href="?action=index&page=' . $i . '">' . $i . '</a></li>';
+            }
+        }
+
+        // Следующая страница
+        if ($currentPage < $totalPages) {
+            $html .= '<li class="page-item"><a class="page-link" href="?action=index&page=' . ($currentPage + 1) . '"><i class="bi bi-chevron-right"></i></a></li>';
+        } else {
+            $html .= '<li class="page-item disabled"><a class="page-link" href="#"><i class="bi bi-chevron-right"></i></a></li>';
+        }
+
+        // Последняя страница
+        if ($currentPage < $totalPages) {
+            $html .= '<li class="page-item"><a class="page-link" href="?action=index&page=' . $totalPages . '"><i class="bi bi-chevron-double-right"></i></a></li>';
+        } else {
+            $html .= '<li class="page-item disabled"><a class="page-link" href="#"><i class="bi bi-chevron-double-right"></i></a></li>';
+        }
+
+        $html .= '</ul></nav>';
 
         return $html;
     }

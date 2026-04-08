@@ -9,12 +9,14 @@ $controller = new RecordController();
 $view = new RecordView();
 
 $action = $_GET['action'] ?? 'index';
+$page = (int)($_GET['page'] ?? 1);
 
 switch ($action) {
     case 'index':
     default:
-        $records = $controller->index();
-        echo $view->list($records);
+        $records = $controller->paginate($page);
+        $totalPages = $controller->totalPages();
+        echo $view->list($records, $page, $totalPages);
         break;
 
     case 'insert':

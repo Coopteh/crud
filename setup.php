@@ -8,10 +8,22 @@ $pdo->exec("CREATE TABLE IF NOT EXISTS records (
     name VARCHAR(200) NOT NULL
 )");
 
-// Очистка и вставка записей
+// Очистка таблицы
+$pdo->exec("TRUNCATE TABLE records");
+
+// Вставка 3 записей
 $stmt = $pdo->prepare("INSERT INTO records (name) VALUES (?)");
 $stmt->execute(['Земля']);
 $stmt->execute(['Луна']);
 $stmt->execute(['Марс']);
 
+// Добавление 20 записей
+$planets = ['Меркурий', 'Венера', 'Сатурн', 'Юпитер', 'Уран', 'Нептун', 'Плутон', 'Эрида', 'Макемаке', 'Хаумеа', 
+'Церера', 'Седна', 'Оркус', 'Квавар', 'Варуна', 'Иксион', 'Ваутор', 'Альчера', 'С/2010 U2', 'Комета Галлея'];
+
+foreach ($planets as $planet) {
+    $stmt->execute([$planet]);
+}
+
 echo "Таблица создана и заполнена!";
+

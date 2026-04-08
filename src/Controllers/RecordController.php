@@ -2,9 +2,21 @@
 
 class RecordController
 {
+    private const PER_PAGE = 10;
+
     public function index(): array
     {
         return Record::all();
+    }
+
+    public function paginate(int $page = 1): array
+    {
+        return Record::paginate($page, self::PER_PAGE);
+    }
+
+    public function totalPages(): int
+    {
+        return (int)ceil(Record::count() / self::PER_PAGE);
     }
 
     public function show(int $id): ?Record

@@ -12,6 +12,24 @@ class Record
         return $stmt->fetchAll(PDO::FETCH_CLASS, Record::class);
     }
 
+    public static function paginate(int $page = 1, int $perPage = 10): array
+    {
+        global $pdo;
+        $offset = ($page - 1) * $perPage;
+        $stmt = $pdo->prepare("SELECT * FROM records LIMIT :limit OFFSET :offset");
+        $stmt->bindValue(':limit', $perPage, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_CLASS, Record::class);
+    }
+
+    public static function count(): int
+    {
+        global $pdo;
+        $stmt = $pdo->query("SELECT COUNT(*) as cnt FROM records");
+        return (int)$stmt->fetch()['cnt'];
+    }
+
     public static function find(int $id): ?Record
     {
         global $pdo;
