@@ -1,6 +1,22 @@
 <?php
 
-require_once __DIR__ . '/src/database.php';
+$host = 'localhost';
+$port = 3307;
+$dbname = 'dbcrud';
+$username = 'root';
+$password = '';
+
+// Подключение без БД для её создания
+try {
+    $pdo = new PDO("mysql:host=$host;port=$port;charset=utf8mb4", $username, $password);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    
+    // Создание БД, если не существует
+    $pdo->exec("CREATE DATABASE IF NOT EXISTS `$dbname`");
+    $pdo->exec("USE `$dbname`");
+} catch (PDOException $e) {
+    die("Connection failed: " . $e->getMessage());
+}
 
 // Создание таблицы
 $pdo->exec("CREATE TABLE IF NOT EXISTS records (
