@@ -1,52 +1,63 @@
 <?php
 
-namespace Crud\Models;
-
 class Record
 {
-    private \PDO $pdo;
+    public int $id = 0;
+    public string $name = '';
 
-    public function __construct()
+    public static function all(): array
     {
-        $dsn = 'mysql:dbname=example1;host=127.0.0.1';
-        $user = 'root';
-        $password = '';
-        $this->pdo = new \PDO($dsn, $user, $password);
+        global $pdo;
+        $stmt = $pdo->query("SELECT * FROM records");
+        return $stmt->fetchAll(PDO::FETCH_CLASS, Record::class);
     }
 
-    public function loadData()
+    public static function paginate(int $page = 1, int $perPage = 10): array
     {
-        $sql = "SELECT * FROM table1";
-        $smtp = $this->pdo->query($sql);
-        return $smtp->fetchAll();
+        global $pdo;
+        $offset = ($page - 1) * $perPage;
+        $stmt = $pdo->prepare("SELECT * FROM records LIMIT :limit OFFSET :offset");
+        $stmt->bindValue(':limit', $perPage, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_CLASS, Record::class);
     }
 
-    public function delete(string $id): void
+    public static function count(): int
     {
-        $sql = "UPDATE table1 SET is_deleted = 1 - is_deleted WHERE id = ?";
-        $smtp = $this->pdo->prepare($sql);
-        $smtp->execute([$id]);
+        global $pdo;
+        $stmt = $pdo->query("SELECT COUNT(*) as cnt FROM records");
+        return (int)$stmt->fetch()['cnt'];
     }
 
-    public function loadRecord(string $id): ?array
+    public static function find(int $id): ?Record
     {
-        $sql = "SELECT * FROM table1 WHERE id = ?";
-        $smtp = $this->pdo->prepare($sql);
-        $smtp->execute([$id]);
-        $row = $smtp->fetch(\PDO::FETCH_ASSOC);
-        return $row;
+        global $pdo;
+        $stmt = $pdo->prepare("SELECT * FROM records WHERE id = ?");
+        $stmt->execute([$id]);
+        $stmt->setFetchMode(PDO::FETCH_CLASS, Record::class);
+        return $stmt->fetch() ?: null;
     }
 
-    public function saveRecord(string $id=null): void
+    public function save(): bool
     {
-        if (isset($id)) {
-            $sql = "UPDATE table1 SET `name` = ? WHERE `id` = ?";
-            $smtp = $this->pdo->prepare($sql);
-            $smtp->execute([$_POST['name'], $_POST['id']]);
-        } else {
-            $sql = "INSERT INTO table1 (`name`) VALUES ( ? )";
-            $smtp = $this->pdo->prepare($sql);
-            $smtp->execute([$_POST['name']]);      
+        global $pdo;
+
+        if ($this->id === 0) {
+            $stmt = $pdo->prepare("INSERT INTO records (name) VALUES (?)");
+            $stmt->execute([$this->name]);
+            $this->id = (int)$pdo->lastInsertId();
+            return true;
         }
+
+        $stmt = $pdo->prepare("UPDATE records SET name = ? WHERE id = ?");
+        return $stmt->execute([$this->name, $this->id]);
+    }
+
+    public function delete(): bool
+    {
+        global $pdo;
+        $stmt = $pdo->prepare("DELETE FROM records WHERE id = ?");
+        return $stmt->execute([$this->id]);
     }
 }

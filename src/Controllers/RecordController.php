@@ -1,47 +1,50 @@
 <?php
 
-namespace Crud\Controllers;
-
-use Crud\Models\Record;
-use Crud\Views\RecordView;
-
 class RecordController
 {
-    public function get()
+    private const PER_PAGE = 10;
+
+    public function index(): array
     {
-        $model = new Record();
-        if (isset($_GET['action'])) {
-            if ($_GET['action'] =='delete') {
-                $model->delete($_GET['id']);
-            }
-            if (($_GET['action'] =='edit') || ($_GET['action'] =='insert')) {
-                $rec = null;
-                if ($_GET['action'] =='edit')
-                    $rec = $model->loadRecord($_GET['id']);
-                $html = RecordView::getForm($rec);
-                return $html;
-            }
-        }
-        
-        return $this->getAll();
+        return Record::all();
     }
 
-    public function getAll()
+    public function paginate(int $page = 1): array
     {
-        $model = new Record();
-        $data = $model->loadData();
-        $html = RecordView::getTemplate($data);
-        return $html;
+        return Record::paginate($page, self::PER_PAGE);
     }
 
-    public function post()
+    public function totalPages(): int
     {
-        $model = new Record();
-        if (isset($_POST['id']) && !empty($_POST['id'])) {    
-            $model->saveRecord($_POST['id']);
-        } else {
-            $model->saveRecord();
-        }
-        return $this->getAll();
+        return (int)ceil(Record::count() / self::PER_PAGE);
+    }
+
+    public function show(int $id): ?Record
+    {
+        return Record::find($id);
+    }
+
+    public function insert(array $data): Record
+    {
+        $record = new Record();
+        $record->name = $data['name'];
+        $record->save();
+        return $record;
+    }
+
+    public function update(int $id, array $data): ?Record
+    {
+        $record = Record::find($id);
+        if (!$record) return null;
+
+        $record->name = $data['name'] ?? $record->name;
+        $record->save();
+        return $record;
+    }
+
+    public function delete(int $id): bool
+    {
+        $record = Record::find($id);
+        return $record ? $record->delete() : false;
     }
 }

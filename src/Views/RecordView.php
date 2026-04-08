@@ -1,81 +1,148 @@
 <?php
 
-namespace Crud\Views;
-
 class RecordView
 {
-    public static function getTemplate($data): string
+    public function list(array $records, int $currentPage = 1, int $totalPages = 1): string
     {
-        $html = <<<HTML
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-            <title>CRUD project</title>
-        </head>
-        <body>
-        HTML;
+        $html = '<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Records</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+</head>
+<body class="container mt-4">
+    <h1>Записи</h1>
+    <table class="table table-striped table-bordered">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Название</th>
+                <th>Действия</th>
+            </tr>
+        </thead>
+        <tbody>';
 
-        $html .= <<<TABLE
-        <div class="container">
-            <h3 class="mt-5">Данные о космических объектах</h3>
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Удалена</th>
-                        <th scope="col">Наименование</th>
-                        <th scope="col">Операции</th>
-                    </tr>
-                </thead>
-            <tbody>
-        TABLE;
-        foreach ($data as $row) {
-            $char_deleted = ($row['is_deleted']) ? '❌' : ' ';
-            $html .= "<tr><td>{$row['id']}</td><td>$char_deleted</td><td>{$row['name']}</td>";
-            $html .= '<td><a href="?action=edit&id=' . $row["id"] . '" class="btn btn-sm btn-secondary">Редактировать</a> ';
-            $html .= '<a href="?action=delete&id=' . $row["id"] . '" class="btn btn-sm btn-secondary">Удалить\восстановить</a>';
-            $html .= "</td></tr>";
+        if (empty($records)) {
+            $html .= '<tr><td colspan="3" class="text-center">Нет записей</td></tr>';
+        } else {
+            foreach ($records as $r) {
+                $html .= '<tr>';
+                $html .= '<td>' . $r->id . '</td>';
+                $html .= '<td>' . htmlspecialchars($r->name) . '</td>';
+                $html .= '<td>';
+                $html .= '<a href="?action=edit&id=' . $r->id . '" class="btn btn-sm btn-warning">Редактировать</a> ';
+                $html .= '<a href="?action=delete&id=' . $r->id . '" class="btn btn-sm btn-danger" onclick="return confirm(\'Удалить?\')">Удалить</a>';
+                $html .= '</td>';
+                $html .= '</tr>';
+            }
         }
-        $html .= "</tbody></table>";
-        $html .= '<a href="?action=insert" class="btn btn-primary mt-3 btn-secondary">Добавить запись</a>';        
-        $html .= "</div></body></html>";
+
+        $html .= '</tbody>
+    </table>';
+
+        // Пагинация
+        $html .= $this->pagination($currentPage, $totalPages);
+
+        $html .= '<a href="?action=insert" class="btn btn-primary mb-3">Добавить запись</a>
+</body>
+</html>';
 
         return $html;
     }
 
-    public static function getForm(?array $rec): string
+    private function pagination(int $currentPage, int $totalPages): string
     {
-        $nameAction = isset($rec) ? "Изменение" : "Добавление";
-        $valueName= isset($rec) ? $rec['name'] : '';
-        $id= isset($rec) ? $rec['id'] : '';
-        $html = <<<FORM
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-            <title>CRUD project</title>
-        </head>
-        <body>
-        <div class="container">
-            <h3 class="mt-5">{$nameAction} данных</h3>        
-            <form method="POST">
-                <div class="mb-3">
-                    <input type="hidden" name="id" value="{$id}">
-                    <label for="name" class="form-label">Наименование</label>
-                    <input type="text" class="form-control" id="name" 
-                    name="name" placeholder="Введите наименование" value="{$valueName}">
-                </div>
-                <button type="submit" class="btn btn-primary">Сохранить</button>
-            </form>
-        </div>
-        </body>
-        </html>
-        FORM;
+        if ($totalPages <= 1) return '';
+
+        $html = '<nav><ul class="pagination justify-content-center">';
+
+        // Первая страница
+        if ($currentPage > 1) {
+            $html .= '<li class="page-item"><a class="page-link" href="?action=index&page=1"><i class="bi bi-chevron-double-left"></i></a></li>';
+        } else {
+            $html .= '<li class="page-item disabled"><a class="page-link" href="#"><i class="bi bi-chevron-double-left"></i></a></li>';
+        }
+
+        // Предыдущая страница
+        if ($currentPage > 1) {
+            $html .= '<li class="page-item"><a class="page-link" href="?action=index&page=' . ($currentPage - 1) . '"><i class="bi bi-chevron-left"></i></a></li>';
+        } else {
+            $html .= '<li class="page-item disabled"><a class="page-link" href="#"><i class="bi bi-chevron-left"></i></a></li>';
+        }
+
+        // Номера страниц
+        for ($i = 1; $i <= $totalPages; $i++) {
+            if ($i == $currentPage) {
+                $html .= '<li class="page-item active"><a class="page-link" href="#">' . $i . '</a></li>';
+            } else {
+                $html .= '<li class="page-item"><a class="page-link" href="?action=index&page=' . $i . '">' . $i . '</a></li>';
+            }
+        }
+
+        // Следующая страница
+        if ($currentPage < $totalPages) {
+            $html .= '<li class="page-item"><a class="page-link" href="?action=index&page=' . ($currentPage + 1) . '"><i class="bi bi-chevron-right"></i></a></li>';
+        } else {
+            $html .= '<li class="page-item disabled"><a class="page-link" href="#"><i class="bi bi-chevron-right"></i></a></li>';
+        }
+
+        // Последняя страница
+        if ($currentPage < $totalPages) {
+            $html .= '<li class="page-item"><a class="page-link" href="?action=index&page=' . $totalPages . '"><i class="bi bi-chevron-double-right"></i></a></li>';
+        } else {
+            $html .= '<li class="page-item disabled"><a class="page-link" href="#"><i class="bi bi-chevron-double-right"></i></a></li>';
+        }
+
+        $html .= '</ul></nav>';
+
         return $html;
+    }
+
+    public function form(?Record $record = null): string
+    {
+        $id = $record ? $record->id : '';
+        $name = $record ? htmlspecialchars($record->name) : '';
+        $btn = $id ? 'Обновить' : 'Создать';
+        $title = $id ? 'Редактирование' : 'Создание';
+        $action = $id ? "?action=update&id=$id" : "?action=create";
+
+        return "<!DOCTYPE html>
+<html lang='ru'>
+<head>
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>$title</title>
+    <link href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css' rel='stylesheet'>
+</head>
+<body class='container mt-4'>
+    <h1>$title</h1>
+    <a href='?action=index' class='btn btn-secondary mb-3'>Назад</a>
+    <form method='post' action='$action'>
+        <div class='mb-3'>
+            <label class='form-label'>Название</label>
+            <input type='text' name='name' value='$name' class='form-control' required>
+        </div>
+        <button type='submit' class='btn btn-primary'>$btn</button>
+    </form>
+</body>
+</html>";
+    }
+
+    private function error(string $message): string
+    {
+        return "<!DOCTYPE html>
+<html lang='ru'>
+<head>
+    <meta charset='UTF-8'>
+    <link href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css' rel='stylesheet'>
+</head>
+<body class='container mt-4'>
+    <div class='alert alert-danger'>$message</div>
+    <a href='?action=index' class='btn btn-secondary'>Назад</a>
+</body>
+</html>";
     }
 }
