@@ -1,45 +1,69 @@
 <?php
+namespace Crud\Models;
+
+use PDO;
+use PDOException;
 
 class Record
 {
-    public int $id;
-    public string $name;
+    private PDO $pdo;
 
-    public static function all(): array
+    public function __construct()
     {
-        global $pdo;
-        $stmt = $pdo->query("SELECT * FROM records");
-        return $stmt->fetchAll(PDO::FETCH_CLASS, Record::class);
-    }
-
-    public static function find(int $id): ?Record
-    {
-        global $pdo;
-        $stmt = $pdo->prepare("SELECT * FROM records WHERE id = ?");
-        $stmt->execute([$id]);
-        $stmt->setFetchMode(PDO::FETCH_CLASS, Record::class);
-        return $stmt->fetch() ?: null;
-    }
-
-    public function save(): bool
-    {
-        global $pdo;
-
-        if (!isset($this->id)) {
-            $stmt = $pdo->prepare("INSERT INTO records (name) VALUES (?)");
-            $stmt->execute([$this->name]);
-            $this->id = (int)$pdo->lastInsertId();
-            return true;
+        $dsn = "mysql:host=localhost;dbname=example1;charset=utf8mb4";
+        $options = [
+            PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            PDO::ATTR_EMULATE_PREPARES   => false,
+        ];
+        try {
+            $this->pdo = new PDO($dsn, 'root', '', $options);
+        } catch (PDOException $e) {
+            die("Ошибка БД: " . $e->getMessage());
         }
-
-        $stmt = $pdo->prepare("UPDATE records SET name = ? WHERE id = ?");
-        return $stmt->execute([$this->name, $this->id]);
     }
 
-    public function delete(): bool
+    public function getAll(?int $limit = null, ?int $offset = null): array
     {
-        global $pdo;
-        $stmt = $pdo->prepare("DELETE FROM records WHERE id = ?");
-        return $stmt->execute([$this->id]);
+        $sql = "SELECT id, name FROM table1 ORDER BY id";
+        if ($limit !== null) {
+            $sql .= " LIMIT :limit OFFSET :offset";
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+            $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->fetchAll();
+        }
+        return $this->pdo->query($sql)->fetchAll();
+    }
+
+    public function countAll(): int
+    {
+        return (int)$this->pdo->query("SELECT COUNT(*) FROM table1")->fetchColumn();
+    }
+
+    public function getById(int $id): array|false
+    {
+        $stmt = $this->pdo->prepare("SELECT id, name FROM table1 WHERE id = :id");
+        $stmt->execute(['id' => $id]);
+        return $stmt->fetch();
+    }
+
+    public function insert(string $name): bool
+    {
+        $stmt = $this->pdo->prepare("INSERT INTO table1 (name) VALUES (:name)");
+        return $stmt->execute(['name' => $name]);
+    }
+
+    public function update(int $id, string $name): bool
+    {
+        $stmt = $this->pdo->prepare("UPDATE table1 SET name = :name WHERE id = :id");
+        return $stmt->execute(['name' => $name, 'id' => $id]);
+    }
+
+    public function delete(int $id): bool
+    {
+        $stmt = $this->pdo->prepare("DELETE FROM table1 WHERE id = :id");
+        return $stmt->execute(['id' => $id]);
     }
 }

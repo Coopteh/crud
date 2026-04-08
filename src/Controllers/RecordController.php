@@ -1,42 +1,69 @@
 <?php
+namespace Crud\Controllers;
+
+use Crud\Models\Record;
+use Crud\Views\RecordView;
 
 class RecordController
 {
-    public function index(): array
+    private Record $model;
+    private RecordView $view;
+
+    public function __construct()
     {
-        return Record::all();
+        $this->model = new Record();
+        $this->view = new RecordView();
     }
 
-    public function show(int $id): ?Record
+    public function handleRequest(): void
     {
-        return Record::find($id);
-    }
+        $action = $_GET['action'] ?? 'index';
+        $page   = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
 
-    public function store(array $data): Record
-    {
-        $record = new Record();
-        $record->title = $data['title'];
-        $record->content = $data['content'];
-        $record->save();
-        return $record;
-    }
+        switch ($action) {
+            case 'insert':
+                if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                    $this->model->insert($_POST['name']);
+                    $this->redirect();
+                }
+                echo $this->view->renderForm('insert');
+                break;
 
-    public function update(int $id, array $data): ?Record
-    {
-        $record = Record::find($id);
-        if (!$record) {
-            return null;
+            case 'update':
+                if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                    $this->model->update((int)$_POST['id'], $_POST['name']);
+                    $this->redirect();
+                }
+                break;
+
+            case 'edit':
+                $record = $this->model->getById((int)$_GET['id']);
+                if ($record) {
+                    echo $this->view->renderForm('edit', $record);
+                } else {
+                    $this->redirect();
+                }
+                break;
+
+            case 'delete':
+                $this->model->delete((int)$_GET['id']);
+                $this->redirect();
+                break;
+
+            case 'index':
+            default:
+                $limit  = 10;
+                $offset = ($page - 1) * $limit;
+                $total  = $this->model->countAll();
+                $records = $this->model->getAll($limit, $offset);
+                echo $this->view->renderIndex($records, $total, $page, $limit);
+                break;
         }
-
-        $record->title = $data['title'] ?? $record->title;
-        $record->content = $data['content'] ?? $record->content;
-        $record->save();
-        return $record;
     }
 
-    public function destroy(int $id): bool
+    private function redirect(): void
     {
-        $record = Record::find($id);
-        return $record ? $record->delete() : false;
+        header('Location: index.php?action=index');
+        exit;
     }
 }
