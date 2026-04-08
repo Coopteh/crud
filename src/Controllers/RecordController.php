@@ -6,7 +6,7 @@ class RecordController
 
     public function index(): array
     {
-        return Record::all();
+        return Record::allWithDeleted();
     }
 
     public function paginate(int $page = 1): array
@@ -34,7 +34,7 @@ class RecordController
 
     public function update(int $id, array $data): ?Record
     {
-        $record = Record::find($id);
+        $record = Record::findWithDeleted($id);
         if (!$record) return null;
 
         $record->name = $data['name'] ?? $record->name;
@@ -44,7 +44,13 @@ class RecordController
 
     public function delete(int $id): bool
     {
-        $record = Record::find($id);
+        $record = Record::findWithDeleted($id);
         return $record ? $record->delete() : false;
+    }
+
+    public function restore(int $id): bool
+    {
+        $record = Record::findWithDeleted($id);
+        return $record ? $record->restore() : false;
     }
 }

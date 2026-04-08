@@ -18,17 +18,19 @@ try {
     die("Connection failed: " . $e->getMessage());
 }
 
-// Создание таблицы
-$pdo->exec("CREATE TABLE IF NOT EXISTS records (
+// Удаление и создание таблицы заново
+$pdo->exec("DROP TABLE IF EXISTS records");
+$pdo->exec("CREATE TABLE records (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(200) NOT NULL
+    name VARCHAR(200) NOT NULL,
+    deleted TINYINT(1) DEFAULT 0
 )");
 
 // Очистка таблицы
 $pdo->exec("TRUNCATE TABLE records");
 
 // Вставка 3 записей
-$stmt = $pdo->prepare("INSERT INTO records (name) VALUES (?)");
+$stmt = $pdo->prepare("INSERT INTO records (name, deleted) VALUES (?, 0)");
 $stmt->execute(['Земля']);
 $stmt->execute(['Луна']);
 $stmt->execute(['Марс']);

@@ -29,12 +29,22 @@ class RecordView
             $html .= '<tr><td colspan="3" class="text-center">Нет записей</td></tr>';
         } else {
             foreach ($records as $r) {
-                $html .= '<tr>';
+                $isDeleted = $r->deleted;
+                $rowClass = $isDeleted ? 'class="table-secondary"' : '';
+                $nameClass = $isDeleted ? 'text-decoration-line-through text-muted' : '';
+                
+                $html .= '<tr ' . $rowClass . '>';
                 $html .= '<td>' . $r->id . '</td>';
-                $html .= '<td>' . htmlspecialchars($r->name) . '</td>';
+                $html .= '<td class="' . $nameClass . '">' . htmlspecialchars($r->name) . '</td>';
                 $html .= '<td>';
-                $html .= '<a href="?action=edit&id=' . $r->id . '" class="btn btn-sm btn-warning">Редактировать</a> ';
-                $html .= '<a href="?action=delete&id=' . $r->id . '" class="btn btn-sm btn-danger" onclick="return confirm(\'Удалить?\')">Удалить</a>';
+                
+                if ($isDeleted) {
+                    $html .= '<a href="?action=restore&id=' . $r->id . '" class="btn btn-sm btn-success">Восстановить</a>';
+                } else {
+                    $html .= '<a href="?action=edit&id=' . $r->id . '" class="btn btn-sm btn-warning">Редактировать</a> ';
+                    $html .= '<a href="?action=delete&id=' . $r->id . '" class="btn btn-sm btn-danger" onclick="return confirm(\'Удалить?\')">Удалить</a>';
+                }
+                
                 $html .= '</td>';
                 $html .= '</tr>';
             }
