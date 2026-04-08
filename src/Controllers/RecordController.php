@@ -12,11 +12,10 @@ class RecordController
         return Record::find($id);
     }
 
-    public function store(array $data): Record
+    public function insert(array $data): Record
     {
         $record = new Record();
-        $record->title = $data['title'];
-        $record->content = $data['content'];
+        $record->name = $data['name'];
         $record->save();
         return $record;
     }
@@ -26,13 +25,12 @@ class RecordController
         $record = Record::find($id);
         if (!$record) return null;
 
-        $record->title = $data['title'] ?? $record->title;
-        $record->content = $data['content'] ?? $record->content;
+        $record->name = $data['name'] ?? $record->name;
         $record->save();
         return $record;
     }
 
-    public function destroy(int $id): bool
+    public function delete(int $id): bool
     {
         $record = Record::find($id);
         return $record ? $record->delete() : false;

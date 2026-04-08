@@ -14,7 +14,6 @@ class RecordView
 </head>
 <body class="container mt-4">
     <h1>Записи</h1>
-    <a href="?action=new" class="btn btn-primary mb-3">Добавить</a>
     <table class="table table-striped table-bordered">
         <thead class="table-dark">
             <tr>
@@ -33,7 +32,6 @@ class RecordView
                 $html .= '<td>' . $r->id . '</td>';
                 $html .= '<td>' . htmlspecialchars($r->name) . '</td>';
                 $html .= '<td>';
-                $html .= '<a href="?action=show&id=' . $r->id . '" class="btn btn-sm btn-info">Просмотр</a> ';
                 $html .= '<a href="?action=edit&id=' . $r->id . '" class="btn btn-sm btn-warning">Редактировать</a> ';
                 $html .= '<a href="?action=delete&id=' . $r->id . '" class="btn btn-sm btn-danger" onclick="return confirm(\'Удалить?\')">Удалить</a>';
                 $html .= '</td>';
@@ -43,33 +41,11 @@ class RecordView
 
         $html .= '</tbody>
     </table>
+    <a href="?action=insert" class="btn btn-primary mb-3">Добавить запись</a>
 </body>
 </html>';
 
         return $html;
-    }
-
-    public function show(?Record $record): string
-    {
-        if (!$record) return $this->error('Не найдено.');
-
-        return '<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Просмотр</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body class="container mt-4">
-    <h1>Просмотр записи</h1>
-    <a href="?action=index" class="btn btn-secondary mb-3">Назад</a>
-    <table class="table table-bordered">
-        <tr><th>ID</th><td>' . $record->id . '</td></tr>
-        <tr><th>Название</th><td>' . htmlspecialchars($record->name) . '</td></tr>
-    </table>
-</body>
-</html>';
     }
 
     public function form(?Record $record = null): string
@@ -78,6 +54,7 @@ class RecordView
         $name = $record ? htmlspecialchars($record->name) : '';
         $btn = $id ? 'Обновить' : 'Создать';
         $title = $id ? 'Редактирование' : 'Создание';
+        $action = $id ? "?action=update&id=$id" : "?action=create";
 
         return "<!DOCTYPE html>
 <html lang='ru'>
@@ -90,7 +67,7 @@ class RecordView
 <body class='container mt-4'>
     <h1>$title</h1>
     <a href='?action=index' class='btn btn-secondary mb-3'>Назад</a>
-    <form method='post'>
+    <form method='post' action='$action'>
         <div class='mb-3'>
             <label class='form-label'>Название</label>
             <input type='text' name='name' value='$name' class='form-control' required>

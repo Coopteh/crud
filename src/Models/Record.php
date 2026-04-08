@@ -2,8 +2,8 @@
 
 class Record
 {
-    public int $id;
-    public string $name;
+    public int $id = 0;
+    public string $name = '';
 
     public static function all(): array
     {
@@ -25,7 +25,7 @@ class Record
     {
         global $pdo;
 
-        if (!isset($this->id)) {
+        if ($this->id === 0) {
             $stmt = $pdo->prepare("INSERT INTO records (name) VALUES (?)");
             $stmt->execute([$this->name]);
             $this->id = (int)$pdo->lastInsertId();
