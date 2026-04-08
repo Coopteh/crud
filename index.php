@@ -50,4 +50,10 @@ switch ($action) {
         $controller->delete($id);
         header('Location: ?action=index');
         exit;
+
+    case 'restore':
+        $id = (int)($_GET['id'] ?? 0);
+        $controller->restore($id);
+        header('Location: ?action=index');
+        exit;
 }
