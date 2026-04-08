@@ -9,26 +9,23 @@ $controller = new RecordController();
 $view = new RecordView();
 
 $action = $_GET['action'] ?? 'index';
+$page = (int)($_GET['page'] ?? 1);
 
 switch ($action) {
     case 'index':
     default:
-        $records = $controller->index();
-        echo $view->list($records);
+        $records = $controller->paginate($page);
+        $totalPages = $controller->totalPages();
+        echo $view->list($records, $page, $totalPages);
         break;
 
-    case 'show':
-        $id = (int)($_GET['id'] ?? 0);
-        echo $view->show($controller->show($id));
-        break;
-
-    case 'new':
+    case 'insert':
         echo $view->form();
         break;
 
     case 'create':
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $controller->store($_POST);
+            $controller->insert($_POST);
             header('Location: ?action=index');
             exit;
         }
@@ -50,7 +47,13 @@ switch ($action) {
 
     case 'delete':
         $id = (int)($_GET['id'] ?? 0);
-        $controller->destroy($id);
+        $controller->delete($id);
+        header('Location: ?action=index');
+        exit;
+
+    case 'restore':
+        $id = (int)($_GET['id'] ?? 0);
+        $controller->restore($id);
         header('Location: ?action=index');
         exit;
 }

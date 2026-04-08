@@ -1,0 +1,69 @@
+@startuml DeluxeAuto
+skinparam componentStyle rectangle
+skinparam defaultFontSize 12
+skinparam linetype ortho
+skinparam nodesep 40
+skinparam ranksep 60
+
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundCorner 10
+
+skinparam rectangle {
+    BackgroundColor #E3F2FD
+    BorderColor #1976D2
+    FontColor #1565C0
+}
+skinparam arrow {
+    Color #757575
+}
+
+title <size:20><b>DeluxeAuto</b></size>\n<size:14>Архитектура автосервиса</size>
+
+package "Frontend" {
+    [Каталог услуг] as SC
+    [Запись на сервис] as BK
+    [Оплата] as PM
+}
+
+package "Backend" {
+    [Управление заказами] as OM
+    [Управление клиентами] as CM
+    [Склад запчастей] as PI
+    [Уведомления] as NT
+    [Аналитика] as AN
+}
+
+package "Внешние системы" {
+    [1С] as ERP
+    [Платёжный шлюз] as PG
+    [SMS/Email] as SP
+}
+
+' Связи
+BK --> SC
+BK --> CM
+BK --> PI
+
+OM --> BK
+OM --> PI
+OM --> PM
+OM --> NT
+OM --> ERP
+
+PM --> NT
+PM --> PG
+
+AN --> SC
+AN --> OM
+AN --> CM
+AN --> PI
+
+NT --> SP
+
+note right of OM
+Центральный\nкомпонент
+end note
+
+@enduml
