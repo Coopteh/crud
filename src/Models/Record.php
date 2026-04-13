@@ -10,7 +10,7 @@ class Record
     public function __construct()
     {
         $this->pdo = new PDO(
-            'mysql:host=127.0.0.1:3307;dbname=example1;charset=utf8mb4',
+            'mysql:host=127.0.0.1;dbname=is231;charset=utf8mb4',
             'root', '',
             [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
         );
@@ -19,7 +19,7 @@ class Record
     public function getAll(int $page = 1, int $perPage = 10): array
     {
         $offset = ($page - 1) * $perPage;
-        $stmt = $this->pdo->prepare('SELECT id, name, deleted FROM table1 ORDER BY id LIMIT :limit OFFSET :offset');
+        $stmt = $this->pdo->prepare('SELECT id_product, name, description, price, created, updated FROM products ORDER BY id_product LIMIT :limit OFFSET :offset');
         $stmt->bindValue(':limit', $perPage, PDO::PARAM_INT);
         $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
         $stmt->execute();
@@ -28,31 +28,40 @@ class Record
     
     public function getCount(): int
     {
-        return (int)$this->pdo->query('SELECT COUNT(*) FROM table1')->fetchColumn();
+        return (int)$this->pdo->query('SELECT COUNT(*) FROM products')->fetchColumn();
     }
     
     public function getById(int $id): ?array
     {
-        $stmt = $this->pdo->prepare('SELECT id, name FROM table1 WHERE id = :id');
+        $stmt = $this->pdo->prepare('SELECT id_product, name, description, price FROM products WHERE id_product = :id');
         $stmt->execute(['id' => $id]);
         return $stmt->fetch() ?: null;
     }
     
-    public function create(string $name): void
+    public function create(array $data): void
     {
-        $stmt = $this->pdo->prepare('INSERT INTO table1 (name, deleted) VALUES (:name, 0)');
-        $stmt->execute(['name' => $name]);
+        $stmt = $this->pdo->prepare('INSERT INTO products (name, description, price) VALUES (:name, :description, :price)');
+        $stmt->execute([
+            'name' => $data['name'],
+            'description' => $data['description'] ?? '',
+            'price' => $data['price']
+        ]);
     }
     
-    public function update(int $id, string $name): void
+    public function update(int $id, array $data): void
     {
-        $stmt = $this->pdo->prepare('UPDATE table1 SET name = :name WHERE id = :id');
-        $stmt->execute(['id' => $id, 'name' => $name]);
+        $stmt = $this->pdo->prepare('UPDATE products SET name = :name, description = :description, price = :price WHERE id_product = :id');
+        $stmt->execute([
+            'id' => $id,
+            'name' => $data['name'],
+            'description' => $data['description'] ?? '',
+            'price' => $data['price']
+        ]);
     }
     
-    public function toggleDelete(int $id): void
+    public function delete(int $id): void
     {
-        $stmt = $this->pdo->prepare('UPDATE table1 SET deleted = IF(deleted = 0, 1, 0) WHERE id = :id');
+        $stmt = $this->pdo->prepare('DELETE FROM products WHERE id_product = :id');
         $stmt->execute(['id' => $id]);
     }
 }

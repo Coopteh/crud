@@ -22,8 +22,12 @@ class RecordController
                 return RecordView::renderForm();
             
             case 'store':
-                if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
-                    $this->model->create($_POST['name']);
+                if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name']) && !empty($_POST['price'])) {
+                    $this->model->create([
+                        'name' => $_POST['name'],
+                        'description' => $_POST['description'] ?? '',
+                        'price' => (float)$_POST['price']
+                    ]);
                 }
                 header('Location: index.php');
                 exit;
@@ -33,15 +37,19 @@ class RecordController
                 return RecordView::renderForm($record);
             
             case 'update':
-                if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['id']) && !empty($_POST['name'])) {
-                    $this->model->update((int)$_POST['id'], $_POST['name']);
+                if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['id']) && !empty($_POST['name']) && !empty($_POST['price'])) {
+                    $this->model->update((int)$_POST['id'], [
+                        'name' => $_POST['name'],
+                        'description' => $_POST['description'] ?? '',
+                        'price' => (float)$_POST['price']
+                    ]);
                 }
                 header('Location: index.php');
                 exit;
             
-            case 'toggle':
+            case 'delete':
                 if (!empty($_GET['id'])) {
-                    $this->model->toggleDelete((int)$_GET['id']);
+                    $this->model->delete((int)$_GET['id']);
                 }
                 header('Location: index.php');
                 exit;
