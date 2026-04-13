@@ -17,7 +17,7 @@ class RecordView
 </head>
 <body class="bg-light">
     <div class="container mt-5">
-        <h1 class="mb-4 text-center">Данные таблицы <code>table1</code></h1>
+        <h1 class="mb-4 text-center">Данные таблицы <code>products</code></h1>
 
         <!-- Кнопка "Добавить запись" -->
         <a href="?action=insert" class="btn btn-primary mb-3">Добавить запись</a>
@@ -45,10 +45,13 @@ class RecordView
                                 <?php foreach ($row as $value): ?>
                                     <td><?= htmlspecialchars($value ?? '', ENT_QUOTES, 'UTF-8') ?></td>
                                 <?php endforeach; ?>
-                                <td>
-                                    <a href="?action=edit&id=<?= $row['id'] ?>" class="btn btn-sm btn-outline-primary">Редактировать</a>
-                                    <a href="?action=delete&id=<?= $row['id'] ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Удалить запись?')">Удалить</a>
+                                <?php $id = $row['id_product'] ?? null;
+                                if ($id !== null): ?>
+                                <td>                                     
+                                    <a href="?action=edit&id=<?= $id ?>" class="btn btn-sm btn-outline-primary">Редактировать</a>
+                                    <a href="?action=delete&id=<?= $id ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Удалить запись?')">Удалить</a>
                                 </td>
+                                <?php endif; ?>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>

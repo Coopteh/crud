@@ -13,7 +13,7 @@ class Record
     public function __construct()
     {
         $host = '127.0.0.1';
-        $db   = 'example1';
+        $db   = 'is231';
         $user = 'root';      // Замените на ваши данные
         $pass = '';          // Замените на ваши данные
         $charset = 'utf8mb4';
@@ -38,7 +38,7 @@ class Record
      */
     public function getAll(): array
     {
-        $stmt = $this->pdo->query('SELECT * FROM table1');
+        $stmt = $this->pdo->query('SELECT * FROM products WHERE is_deleted = 0');
         return $stmt->fetchAll();
     }
     /**
@@ -46,7 +46,7 @@ class Record
      */
     public function getById(int $id): ?array
     {
-        $stmt = $this->pdo->prepare('SELECT * FROM table1 WHERE id = :id AND is_deleted = 0');
+        $stmt = $this->pdo->prepare('SELECT * FROM products WHERE id_product = :id AND is_deleted = 0');
         $stmt->execute(['id' => $id]);
         $result = $stmt->fetch();
         return $result ?: null;
@@ -58,12 +58,12 @@ class Record
     public function insert(array $data): bool
     {
         // Исключаем id и is_deleted из вставки
-        $data = array_filter($data, fn($k) => !in_array($k, ['id', 'is_deleted']), ARRAY_FILTER_USE_KEY);
+        $data = array_filter($data, fn($k) => !in_array($k, ['id_product', 'is_deleted']), ARRAY_FILTER_USE_KEY);
         
         $columns = implode(', ', array_keys($data));
         $placeholders = ':' . implode(', :', array_keys($data));
         
-        $sql = "INSERT INTO table1 ($columns) VALUES ($placeholders)";
+        $sql = "INSERT INTO products ($columns) VALUES ($placeholders)";
         $stmt = $this->pdo->prepare($sql);
         return $stmt->execute($data);
     }
@@ -72,20 +72,20 @@ class Record
      * Обновляет существующую запись
      */
     public function update(int $id, array $data): bool
-    {
-        // Исключаем id и is_deleted из обновления
-        $data = array_filter($data, fn($k) => !in_array($k, ['id', 'is_deleted']), ARRAY_FILTER_USE_KEY);
-        
-        $setParts = [];
-        foreach (array_keys($data) as $key) {
-            $setParts[] = "$key = :$key";
-        }
-        $set = implode(', ', $setParts);
-        
-        $sql = "UPDATE table1 SET $set WHERE id = :id AND is_deleted = 0";
-        $data['id'] = $id;
-        $stmt = $this->pdo->prepare($sql);
-        return $stmt->execute($data);
+{
+    $data = array_filter($data, fn($k) => !in_array($k, ['id_product', 'is_deleted']), ARRAY_FILTER_USE_KEY);
+    
+    $setParts = [];
+    foreach (array_keys($data) as $key) {
+        $setParts[] = "$key = :$key";
+    }
+    $set = implode(', ', $setParts);
+    
+    $sql = "UPDATE products SET $set WHERE id_product = :id_product AND is_deleted = 0";
+    $data['id_product'] = $id;
+    
+    $stmt = $this->pdo->prepare($sql);
+    return $stmt->execute($data);
     }
 
     /**
@@ -93,7 +93,7 @@ class Record
      */
     public function delete(int $id): bool
     {
-        $stmt = $this->pdo->prepare('UPDATE table1 SET is_deleted = 1 WHERE id = :id');
+        $stmt = $this->pdo->prepare('UPDATE products SET is_deleted = 1 WHERE id_product = :id');
         return $stmt->execute(['id' => $id]);
     }
 
@@ -102,12 +102,12 @@ class Record
      */
     public function getFormFields(): array
     {
-        $stmt = $this->pdo->query('DESCRIBE table1');
+        $stmt = $this->pdo->query('DESCRIBE products');
         $columns = $stmt->fetchAll();
         
         $fields = [];
         foreach ($columns as $col) {
-            if (!in_array($col['Field'], ['id', 'is_deleted', 'created_at', 'updated_at'])) {
+            if (!in_array($col['Field'], ['id_product', 'is_deleted', 'created_at', 'updated_at'])) {
                 $fields[] = [
                     'name' => $col['Field'],
                     'type' => $col['Type'],
