@@ -1,6 +1,5 @@
 <?php
 namespace Crud\Controllers;
-
 use Crud\Models\Record;
 use Crud\Views\RecordView;
 
@@ -23,7 +22,12 @@ class RecordController
         switch ($action) {
             case 'insert':
                 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                    $this->model->insert($_POST['name']);
+                    $this->model->insert([
+                        'name'        => $_POST['name'],
+                        'description' => $_POST['description'] ?? '',
+                        'image'       => $_POST['image'] ?? '',
+                        'price'       => (float)$_POST['price']
+                    ]);
                     $this->redirect();
                 }
                 echo $this->view->renderForm('insert');
@@ -31,7 +35,12 @@ class RecordController
 
             case 'update':
                 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                    $this->model->update((int)$_POST['id'], $_POST['name']);
+                    $this->model->update((int)$_POST['id'], [
+                        'name'        => $_POST['name'],
+                        'description' => $_POST['description'] ?? '',
+                        'image'       => $_POST['image'] ?? '',
+                        'price'       => (float)$_POST['price']
+                    ]);
                     $this->redirect();
                 }
                 break;
@@ -45,9 +54,9 @@ class RecordController
                 }
                 break;
 
-            case 'toggle':
+            case 'delete':
                 if (isset($_GET['id'])) {
-                    $this->model->toggleStatus((int)$_GET['id']);
+                    $this->model->delete((int)$_GET['id']);
                 }
                 $this->redirect();
                 break;

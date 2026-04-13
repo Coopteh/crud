@@ -1,6 +1,5 @@
 <?php
 namespace Crud\Models;
-
 use PDO;
 use PDOException;
 
@@ -10,7 +9,7 @@ class Record
 
     public function __construct()
     {
-        $dsn = "mysql:host=localhost;dbname=example1;charset=utf8mb4";
+        $dsn = 'mysql:dbname=is231;host=127.0.0.1';
         $options = [
             PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
@@ -25,7 +24,8 @@ class Record
 
     public function getAll(?int $limit = null, ?int $offset = null): array
     {
-        $sql = "SELECT id, name, is_deleted FROM table1 ORDER BY id";
+        $sql = "SELECT id_product, name, description, image, price, created, updated 
+                FROM products ORDER BY id_product DESC";
         if ($limit !== null) {
             $sql .= " LIMIT :limit OFFSET :offset";
             $stmt = $this->pdo->prepare($sql);
@@ -39,34 +39,36 @@ class Record
 
     public function countAll(): int
     {
-        return (int)$this->pdo->query("SELECT COUNT(*) FROM table1")->fetchColumn();
+        return (int)$this->pdo->query("SELECT COUNT(*) FROM products")->fetchColumn();
     }
 
     public function getById(int $id): array|false
     {
-        $stmt = $this->pdo->prepare("SELECT id, name FROM table1 WHERE id = :id");
+        $stmt = $this->pdo->prepare("SELECT id_product, name, description, image, price, created, updated 
+                                     FROM products WHERE id_product = :id");
         $stmt->execute(['id' => $id]);
         return $stmt->fetch();
     }
 
-    public function insert(string $name): bool
+    public function insert(array $data): bool
     {
-        $stmt = $this->pdo->prepare("INSERT INTO table1 (name, is_deleted) VALUES (:name, 0)");
-        return $stmt->execute(['name' => $name]);
+        $stmt = $this->pdo->prepare("INSERT INTO products (name, description, image, price) 
+                                     VALUES (:name, :description, :image, :price)");
+        return $stmt->execute($data);
     }
 
-    public function update(int $id, string $name): bool
+    public function update(int $id, array $data): bool
     {
-        $stmt = $this->pdo->prepare("UPDATE table1 SET name = :name WHERE id = :id");
-        return $stmt->execute(['name' => $name, 'id' => $id]);
+        $stmt = $this->pdo->prepare("UPDATE products SET name = :name, description = :description, 
+                                     image = :image, price = :price, updated = NOW() 
+                                     WHERE id_product = :id");
+        $data['id'] = $id;
+        return $stmt->execute($data);
     }
 
-    /**
-     * Переключает статус удаления: 0 -> 1, 1 -> 0
-     */
-    public function toggleStatus(int $id): bool
+    public function delete(int $id): bool
     {
-        $stmt = $this->pdo->prepare("UPDATE table1 SET is_deleted = IF(is_deleted = 1, 0, 1) WHERE id = :id");
+        $stmt = $this->pdo->prepare("DELETE FROM products WHERE id_product = :id");
         return $stmt->execute(['id' => $id]);
     }
 }
