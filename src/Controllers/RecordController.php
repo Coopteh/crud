@@ -62,8 +62,8 @@ class RecordController{    // Константы для настройки па�
                 exit;
 
             case 'edit':
-                $id = (int)($_GET['id'] ?? 0);
-                $record = $id > 0 ? $this->model->getById($id) : null;
+                $id_product = (int)($_GET['id_product'] ?? 0);
+                $record = $id_product > 0 ? $this->model->getByid_product($id_product) : null;
 
                 // Передаём только данные для редактирования, список записей не нужен
                 $data = ['edit_data' => $record];
@@ -72,10 +72,10 @@ class RecordController{    // Константы для настройки па�
 
             case 'update':
                 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                    $id = (int)($_POST['id'] ?? 0);
+                    $id_product = (int)($_POST['id_product'] ?? 0);
                     $name = trim($_POST['name'] ?? '');
-                    if ($id > 0 && !empty($name)) {
-                        $this->model->update($id, $name);
+                    if ($id_product > 0 && !empty($name)) {
+                        $this->model->update($id_product, $name);
                     }
                 }
 
@@ -85,9 +85,9 @@ class RecordController{    // Константы для настройки па�
                 exit;
 
             case 'toggle_delete':
-                $id = (int)($_GET['id'] ?? 0);
-                if ($id > 0) {
-                    $this->model->toggleDeleted($id);
+                $id_product = (int)($_GET['id_product'] ?? 0);
+                if ($id_product > 0) {
+                    $this->model->toggleDeleted($id_product);
                 }
 
                 // Сохраняем текущую страницу при редиректе после удаления
@@ -97,9 +97,9 @@ class RecordController{    // Константы для настройки па�
 
             case 'delete':
                 // Если нужно физическое удаление вместо soft delete:
-                $id = (int)($_GET['id'] ?? 0);
-                if ($id > 0) {
-                    $this->model->delete($id);
+                $id_product = (int)($_GET['id_product'] ?? 0);
+                if ($id_product > 0) {
+                    $this->model->delete($id_product);
                 }
 
                 // Сохраняем текущую страницу при редиректе после удаления

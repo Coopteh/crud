@@ -12,7 +12,7 @@ class Record
     public function __construct()
     {
         $host = 'localhost';
-        $db   = 'example1';
+        $db   = 'is231';
         $user = 'root';
         $pass = '';
         $charset = 'utf8mb4';
@@ -35,7 +35,7 @@ class Record
     public function getAll(int $limit = 0, int $offset = 0): array
     {
         // Базовый SQL-запрос
-        $sql = 'SELECT id, name, is_deleted FROM table1 ORDER BY id ASC';
+        $sql = 'SELECT id_product, name, description, prise, is_deleted, updated FROM products ORDER BY id_product ASC';;
         
         // Если переданы параметры для пагинации ($limit > 0), модифицируем запрос
         if ($limit > 0) {
@@ -53,45 +53,45 @@ class Record
     }
 
 
-    // Получить одну запись по ID
-    public function getById(int $id): ?array
+    // Получить одну запись по id_product
+    public function getByid_product(int $id_product): ?array
     {
-        $stmt = $this->pdo->prepare('SELECT id, name, is_deleted FROM table1 WHERE id = :id');
-        $stmt->execute(['id' => $id]);
+        $stmt = $this->pdo->prepare('SELECT id_product, name, is_deleted FROM products WHERE id_product = :id_product');
+        $stmt->execute(['id_product' => $id_product]);
         return $stmt->fetch() ?: null;
     }
 
     // Добавить новую запись
     public function insert(string $name): bool
     {
-        $stmt = $this->pdo->prepare('INSERT INTO table1 (name, is_deleted) VALUES (:name, 0)');
+        $stmt = $this->pdo->prepare('INSERT INTO products (name, is_deleted) VALUES (:name, 0)');
         return $stmt->execute(['name' => $name]);
     }
 
     // Обновить запись
-    public function update(int $id, string $name): bool
+    public function update(int $id_product, string $name): bool
     {
-        $stmt = $this->pdo->prepare('UPDATE table1 SET name = :name WHERE id = :id');
-        return $stmt->execute(['name' => $name, 'id' => $id]);
+        $stmt = $this->pdo->prepare('UPDATE products SET name = :name WHERE id_product = :id_product');
+        return $stmt->execute(['name' => $name, 'id_product' => $id_product]);
     }
 
     // Переключить флаг is_delited (soft delete)
-    public function toggleDeleted(int $id): bool
+    public function toggleDeleted(int $id_product): bool
     {
-        $stmt = $this->pdo->prepare('UPDATE table1 SET is_deleted = NOT is_deleted WHERE id = :id');
-        return $stmt->execute(['id' => $id]);
+        $stmt = $this->pdo->prepare('UPDATE products SET is_deleted = NOT is_deleted WHERE id_product = :id_product');
+        return $stmt->execute(['id_product' => $id_product]);
     }
 
     // Физическое удаление (если нужно)
-    public function delete(int $id): bool
+    public function delete(int $id_product): bool
     {
-        $stmt = $this->pdo->prepare('DELETE FROM table1 WHERE id = :id');
-        return $stmt->execute(['id' => $id]);
+        $stmt = $this->pdo->prepare('DELETE FROM products WHERE id_product = :id_product');
+        return $stmt->execute(['id_product' => $id_product]);
     }
 
     public function getTotalCount(): int
     {
-        $stmt = $this->pdo->query("SELECT COUNT(*) FROM table1");
+        $stmt = $this->pdo->query("SELECT COUNT(*) FROM products");
         return (int) $stmt->fetchColumn();
     }
 }

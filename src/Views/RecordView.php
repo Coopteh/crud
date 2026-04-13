@@ -7,19 +7,19 @@ class RecordView
     public function render(array $records, string $action = 'list'): void
     {
         // Явно задаём отображаемые колонки
-        $displayColumns = ['id', 'name', 'is_deleted', 'option'];
+        $displayColumns = ['id_product', 'name','description','prise', 'is_deleted','updated', 'option'];
         ?>
         <!DOCTYPE html>
         <html lang="ru">
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Таблица table1</title>
+            <title>Таблица productsts</title>
             <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
         </head>
         <body class="bg-light">
             <div class="container mt-5">
-                <h2 class="mb-4">Записи из таблицы <code>table1</code></h2>
+                <h2 class="mb-4">Записи из таблицы <code>productsts</code></h2>
 
                 <!-- Кнопка "Добавить запись" -->
                 <a href="?action=insert" class="btn btn-primary mb-3">Добавить запись</a>
@@ -30,13 +30,13 @@ class RecordView
                         <h5><?= $action === 'edit' ? 'Редактировать запись' : 'Новая запись' ?></h5>
                         <form method="POST" action="?action=<?= $action === 'edit' ? 'update' : 'store' ?>">
                             <?php if ($action === 'edit' && !empty($records['edit_data'])): ?>
-                                <input type="hidden" name="id" value="<?= htmlspecialchars($records['edit_data']['id']) ?>">
+                                <input type="hidden" name="id_product" value="<?= htmlspecialchars($records['edit_data']['id_product']) ?>">
                             <?php endif; ?>
                             <div class="mb-3">
                                 <label for="name" class="form-label">Название</label>
                                 <input type="text"
                                        class="form-control"
-                                       id="name"
+                                       id_product="name"
                                        name="name"
                                        value="<?= htmlspecialchars($records['edit_data']['name'] ?? '') ?>"
                                        maxlength="20"
@@ -62,16 +62,20 @@ class RecordView
                             <?php if (!empty($records['data']) && is_array($records['data'])): ?>
                                 <?php foreach ($records['data'] as $row): ?>
                                     <tr class="<?= !empty($row['is_deleted']) ? 'table-danger' : '' ?>">
-                                        <td><?= htmlspecialchars($row['id']) ?></td>
+                                        <td><?= htmlspecialchars($row['id_product']) ?></td>
                                         <td><?= htmlspecialchars($row['name']) ?></td>
+                                        <td><?= htmlspecialchars($row['description']) ?></td>
+                                        <td><?= htmlspecialchars($row['prise']) ?></td>
+
                                         <td>
                                             <?= !empty($row['is_deleted']) ? '✅ Да' : '❌ Нет' ?>
                                         </td>
+                                        <td><?= htmlspecialchars($row['updated']) ?></td>
                                         <td>
                                             <!-- Кнопка Редактировать -->
-                                            <a href="?action=edit&id=<?= $row['id'] ?>" class="btn btn-sm btn-warning">Редактировать</a>
+                                            <a href="?action=edit&id_product=<?= $row['id_product'] ?>" class="btn btn-sm btn-warning">Редактировать</a>
                                             <!-- Кнопка пометить/снять пометку на удаление -->
-                                            <a href="?action=toggle_delete&id=<?= $row['id'] ?>"
+                                            <a href="?action=toggle_delete&id_product=<?= $row['id_product'] ?>"
                                                class="btn btn-sm <?= !empty($row['is_deleted']) ? 'btn-outline-danger' : 'btn-danger' ?>"
                                                onclick="return confirm('<?= !empty($row['is_deleted']) ? 'Снять пометку на удаление?' : 'Пометить на удаление?' ?>')">
                                                 <?= !empty($row['is_deleted']) ? 'Снять пометку' : 'Удалить' ?>
