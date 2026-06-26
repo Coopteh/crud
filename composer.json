@@ -5,5 +5,8 @@
             "Test\\": "tests/"
         }
     
-    }
+    },
+        "require-dev": {
+                "phpunit/phpunit": "^11.5"
+        }
 }
